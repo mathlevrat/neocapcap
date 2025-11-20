@@ -3,12 +3,10 @@ import { GoogleGenAI } from "@google/genai";
 // IMPORTANT: Pour le déploiement sur Netlify, `process.env.API_KEY` n'est pas disponible côté client.
 // Remplacez la valeur ci-dessous par votre propre clé API Gemini.
 // AVERTISSEMENT: N'exposez jamais votre clé API dans une application de production publique.
-const API_KEY = process.env.API_KEY || "VOTRE_API_KEY_GEMINI_ICI";
+export const API_KEY = process.env.API_KEY || "VOTRE_API_KEY_GEMINI_ICI";
 
 if (API_KEY === "VOTRE_API_KEY_GEMINI_ICI") {
   console.warn("Veuillez remplacer 'VOTRE_API_KEY_GEMINI_ICI' par votre véritable clé API Gemini dans le fichier services/geminiService.ts");
-  // Optional: You could also throw an error to stop the app from running without a key
-  // throw new Error("Clé API Gemini manquante. Veuillez configurer la clé dans services/geminiService.ts");
 }
 
 // Initialize the client with the API key
@@ -36,9 +34,6 @@ export const generateCapDesign = async (userPrompt: string): Promise<string> => 
       },
       config: {
         // Using a square aspect ratio is best for cap front panels
-        // Note: imageConfig might not be strictly typed in all versions yet, but this matches guidance
-        // For 2.5 flash image, we rely on the model default or prompt instruction mostly, 
-        // but we can pass config if supported.
       },
     });
 
@@ -57,8 +52,7 @@ export const generateCapDesign = async (userPrompt: string): Promise<string> => 
 
   } catch (error) {
     console.error("Erreur lors de la génération:", error);
-    // Check for common API key errors
-    if (error.message.includes('API key not valid')) {
+    if (error instanceof Error && error.message.includes('API key not valid')) {
        throw new Error("La clé API n'est pas valide. Veuillez vérifier votre clé dans services/geminiService.ts.");
     }
     throw error;

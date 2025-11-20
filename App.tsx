@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { generateCapDesign } from './services/geminiService';
+import React, { useState, useCallback, useEffect } from 'react';
+import { generateCapDesign, API_KEY } from './services/geminiService';
 import { AppState, CapColor, DesignSession } from './types';
 import { NeonButton } from './components/NeonButton';
 import { CapSVG } from './components/CapSVG';
@@ -14,6 +14,13 @@ export default function App() {
     isLoading: false,
     error: null,
   });
+  const [apiKeyWarning, setApiKeyWarning] = useState(false);
+
+  useEffect(() => {
+    if (API_KEY === "VOTRE_API_KEY_GEMINI_ICI") {
+      setApiKeyWarning(true);
+    }
+  }, []);
 
   const handleGenerate = useCallback(async () => {
     if (!session.prompt.trim()) return;
@@ -27,10 +34,11 @@ export default function App() {
         isLoading: false
       }));
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Une erreur inconnue est survenue. Veuillez vérifier la console.";
       setSession(prev => ({
         ...prev,
         isLoading: false,
-        error: "La génération a échoué. Veuillez réessayer."
+        error: errorMessage
       }));
     }
   }, [session.prompt]);
@@ -113,9 +121,15 @@ export default function App() {
 
         {/* Action Button */}
         <div className="mt-auto pt-6 border-t border-white/10">
+          {apiKeyWarning && (
+            <div className="text-yellow-300 text-sm mb-4 font-mono bg-yellow-900/40 p-3 border border-yellow-500/40 rounded">
+              <strong>ATTENTION:</strong> Votre clé API Gemini n'est pas configurée. Veuillez l'ajouter dans le fichier 
+              <code className="bg-black/50 px-1 rounded mx-1">services/geminiService.ts</code> pour que l'IA fonctionne.
+            </div>
+          )}
           {session.error && (
-            <p className="text-red-400 text-sm mb-4 font-mono bg-red-900/20 p-2 border border-red-900 rounded">
-              Error: {session.error}
+            <p className="text-red-400 text-sm mb-4 font-mono bg-red-900/30 p-3 border border-red-500/40 rounded">
+              {session.error}
             </p>
           )}
           <NeonButton 
