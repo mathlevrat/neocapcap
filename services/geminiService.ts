@@ -1,7 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the client with the API key from the environment
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// IMPORTANT: Pour le déploiement sur Netlify, `process.env.API_KEY` n'est pas disponible côté client.
+// Remplacez la valeur ci-dessous par votre propre clé API Gemini.
+// AVERTISSEMENT: N'exposez jamais votre clé API dans une application de production publique.
+const API_KEY = process.env.API_KEY || "VOTRE_API_KEY_GEMINI_ICI";
+
+if (API_KEY === "VOTRE_API_KEY_GEMINI_ICI") {
+  console.warn("Veuillez remplacer 'VOTRE_API_KEY_GEMINI_ICI' par votre véritable clé API Gemini dans le fichier services/geminiService.ts");
+  // Optional: You could also throw an error to stop the app from running without a key
+  // throw new Error("Clé API Gemini manquante. Veuillez configurer la clé dans services/geminiService.ts");
+}
+
+// Initialize the client with the API key
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 /**
  * Generates an image design for a cap based on user prompt using Gemini 2.5 Flash Image.
@@ -46,6 +57,10 @@ export const generateCapDesign = async (userPrompt: string): Promise<string> => 
 
   } catch (error) {
     console.error("Erreur lors de la génération:", error);
+    // Check for common API key errors
+    if (error.message.includes('API key not valid')) {
+       throw new Error("La clé API n'est pas valide. Veuillez vérifier votre clé dans services/geminiService.ts.");
+    }
     throw error;
   }
 };

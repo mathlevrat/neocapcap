@@ -38,5 +38,11 @@
 </head>
   <body>
     <div id="root"></div>
+
+    <!-- 1. Add Babel for JSX/TSX transpilation directly in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- 2. Load the React application using Babel -->
+    <script type="text/babel" data-type="module" src="index.tsx"></script>
   </body>
 </html>
